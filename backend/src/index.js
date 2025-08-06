@@ -67,12 +67,16 @@ io.on('connection', (socket) => {
 
   })
 
+  //
+
   socket.on('join-room', (roomID) => {
 
 
     if (rooms.includes(roomID)) {
       const totalRoomClient = io.sockets.adapter.rooms.get(roomID)?.size ?? 0;
       const clients = io.sockets.adapter.rooms.get(roomID);
+
+      socket.emit('room-clients', totalRoomClient)
 
       if (totalRoomClient<2) {
         socket.join(roomID);
@@ -90,6 +94,15 @@ io.on('connection', (socket) => {
       console.log('room does not exist!!!!!');
     }
    
+  })
+
+  socket.on('leave-room', (roomID) =>{
+
+    socket.leave(roomID)
+    console.log('⬅️ ', socket.id , ' left room ', roomID);
+    
+    socket.to(roomID).emit('leave-room', socket.id)
+
   })
 
 

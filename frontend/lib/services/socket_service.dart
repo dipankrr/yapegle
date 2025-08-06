@@ -14,6 +14,7 @@ class SocketService extends ChangeNotifier {
   late IO.Socket _socket;
   final List<Message> _messages = [];
   String roomId = '';
+  //dynamic clients;
 
   List<Message> get messages => List.unmodifiable(_messages);
 
@@ -64,9 +65,26 @@ class SocketService extends ChangeNotifier {
       print(roomId);
     });
 
+    _socket.on('leave-room', (socketId) {
+
+      final msg = Message(msg: '$socketId left the room', isMe: false, isNoti: true);
+      sendMessage('$socketId left the room', true);
+      _messages.add(msg);
+      print(socketId + ' left the room');
+     // _messages.clear();
+      notifyListeners();
+    });
+
     _socket.on('room-full', (roomID) {
+      //if(_socket.id)
+      sendMessage('Room is full', true);
       print('room is full');
     });
+
+    // _socket.on('room-clients', (clientsNum) {
+    //   clients = clientsNum;
+    //   print(clientsNum+' people in the room');
+    // });
 
 
     _socket.onDisconnect((_) {
@@ -91,17 +109,28 @@ class SocketService extends ChangeNotifier {
 
   void joinRoom (String roomID){
     //connectToServer();
-    roomId = roomID;
     _socket.emit('join-room', roomID);
+    _socket.on('room-clients', (totalRoomClient){
+      if (totalRoomClient <2){
+        roomId = roomID;
+      }
+    });
 
   }
 
-  void sendMessage(String message) {
+  void leaveRoom (){
+    _socket.emit('leave-room', roomId);
+    _messages.clear();
+    notifyListeners();
+  }
+
+  void sendMessage(String message, bool isNoti) {
 
     final data = Message(
         room : roomId,
         msg : message,
-        isMe : false
+        isMe : false,
+        isNoti: isNoti
     );
     _socket.emit('chat-message', data.toJson());
   }
