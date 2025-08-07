@@ -15,7 +15,7 @@ class _MessageInputState extends State<MessageInput> {
   void _sendMessage() {
     final text = _controller.text;
     Provider.of<SocketService>(context, listen: false).sendMessage(text, false);
-    Provider.of<SocketService>(context, listen: false).sendOwnMsg(text);
+    Provider.of<SocketService>(context, listen: false).sendOwnMsg(text, false);
     _controller.clear();
   }
 

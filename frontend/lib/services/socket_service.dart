@@ -30,7 +30,7 @@ class SocketService extends ChangeNotifier {
     _isConnecting = true;
 
     _socket = IO.io(
-      'http://localhost:3500', // use 10.0.2.2 for Android emulator
+      'http://192.168.0.102:3500', // use 10.0.2.2 for Android emulator
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
@@ -59,33 +59,29 @@ class SocketService extends ChangeNotifier {
       print(roomId);
     });
 
-    _socket.on('join-room', (roomID) {
+    _socket.on('room-joined', (roomID) {
       roomId = roomID;
+      sendMessage('joined room', true);
+      sendOwnMsg('you joined room $roomID', true);
       notifyListeners();
       print(roomId);
     });
 
     _socket.on('leave-room', (socketId) {
 
-      final msg = Message(msg: '$socketId left the room', isMe: false, isNoti: true);
       sendMessage('$socketId left the room', true);
-      _messages.add(msg);
+      sendOwnMsg('$socketId left the room', true);
+      //roomId = '';
       print(socketId + ' left the room');
      // _messages.clear();
       notifyListeners();
     });
 
-    _socket.on('room-full', (roomID) {
+    _socket.on('room-full', (sId) {
       //if(_socket.id)
-      sendMessage('Room is full', true);
-      print('room is full');
+      sendOwnMsg('Room is full', true);
+      print(sId + ' tried but room is full');
     });
-
-    // _socket.on('room-clients', (clientsNum) {
-    //   clients = clientsNum;
-    //   print(clientsNum+' people in the room');
-    // });
-
 
     _socket.onDisconnect((_) {
       _isConnected = false;
@@ -96,30 +92,27 @@ class SocketService extends ChangeNotifier {
 
   //
 
+
   void createRoom(bool data) {
-    // connectToServer();
+     connectToServer();
     _socket.emit('create-room', data);
 
-    // _socket.on('create-room', (roomID){
-    //   roomId = roomID;
-    //   print(roomID + '***' + roomId);
-    // });
-    notifyListeners();
   }
 
   void joinRoom (String roomID){
     //connectToServer();
     _socket.emit('join-room', roomID);
-    _socket.on('room-clients', (totalRoomClient){
-      if (totalRoomClient <2){
-        roomId = roomID;
-      }
-    });
+    // _socket.on('room-clients', (totalRoomClient){
+    //   if (totalRoomClient <2){
+    //     roomId = roomID;
+    //   }
+    // });
 
   }
 
   void leaveRoom (){
     _socket.emit('leave-room', roomId);
+    roomId = '';
     _messages.clear();
     notifyListeners();
   }
@@ -135,8 +128,8 @@ class SocketService extends ChangeNotifier {
     _socket.emit('chat-message', data.toJson());
   }
 
-  void sendOwnMsg (String msg){
-    final data = Message(msg: msg, isMe: true);
+  void sendOwnMsg (String msg, bool isNoti){
+    final data = Message(msg: msg, isMe: true, isNoti: isNoti);
     _messages.add(data);
     notifyListeners();
   }

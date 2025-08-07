@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:frontend/routes/custom_nav.dart';
 import 'package:frontend/services/socket_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -89,7 +90,8 @@ return Dialog(
               onTap: () {
                // prov.joinRoom(prov.roomId);
                 // Navigate to room logic
-                context.go('/room/${prov.roomId}');
+                //context.go('/room/${prov.roomId}');
+                hardNavigateToRoom(prov.roomId);
 
               },
               child: Container(

@@ -19,9 +19,10 @@ final GoRouter appRoute = GoRouter(
             final String? pathRoomId = state.pathParameters['roomId'];
             // TODO: when lands this url make user join and connect to server
 
-            final socketService = context.watch<SocketService>();
+            final socketService = context.read<SocketService>();
 
-            socketService.connectToServer();
+            socketService.connectToServer(); // y/n?
+            print('🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨🚨');
             socketService.joinRoom(pathRoomId!);
             return const ChatRoomPage();
         }

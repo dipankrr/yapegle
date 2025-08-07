@@ -54,7 +54,7 @@ return
                     ),
                     GestureDetector(
                       onTap: (){
-                        prov.connectToServer();
+                        //prov.connectToServer();
                         prov.createRoom(true);
                         showRoomCreatedDialog(context);
                       },

@@ -1,4 +1,3 @@
-
 const express = require('express');
 const { nanoid } = require('nanoid');
 const http = require('http');
@@ -12,7 +11,7 @@ const io = new Server(server, {
   },
 });
 
- 
+
  let rooms = []
 
 
@@ -32,19 +31,19 @@ io.on('connection', (socket) => {
 
       try {
         const matchedUser = waitingQueue.shift();
-        
+
         const roomID = `r-${matchedUser.id}-${socket.id}`
-  
+
         matchedUser.join(roomID)
         socket.join(roomID)
-        
+
       } catch (error) {
-        
+
       }
     } else{
       waitingQueue = socket
     }
-    
+
   })
 
   // custom room
@@ -62,7 +61,7 @@ io.on('connection', (socket) => {
 
       socket.emit('create-room', roomID);
     }
-   
+
     //socket.join(roomID);
 
   })
@@ -79,34 +78,28 @@ io.on('connection', (socket) => {
       socket.emit('room-clients', totalRoomClient)
 
       if (totalRoomClient<2) {
-        // if (if socket.id exists in room already) {
-
-        //   return
-        // }
         socket.join(roomID);
         socket.emit('room-joined', roomID)
         console.log(`${socket.id} joined in room ${roomID}`);
 
       } else {
-        socket.emit('room-full', socket.id )
-        console.log(socket.id , " 👈 this nigga tried to join room ", roomID);
-        
+        socket.emit('room-full', roomID )
         console.log('room is full - ', totalRoomClient, clients);
-        
+
       }
-       
-       
+
+
     } else{
       console.log('room does not exist!!!!!');
     }
-   
+
   })
 
   socket.on('leave-room', (roomID) =>{
 
     socket.leave(roomID)
     console.log('⬅️ ', socket.id , ' left room ', roomID);
-    
+
     socket.to(roomID).emit('leave-room', socket.id)
 
   })
@@ -139,6 +132,6 @@ app.get('/', (req, res) => {
 
 // server listen
 
-server.listen(3500, '192.168.0.102', () => {
+server.listen(3500, () => {
   console.log('🚀 Server listening on http://localhost:3500');
 });
