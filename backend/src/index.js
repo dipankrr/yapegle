@@ -78,11 +78,13 @@ io.on('connection', (socket) => {
 
       socket.emit('room-clients', totalRoomClient)
 
-      if (totalRoomClient<2) {
-        // if (if socket.id exists in room already) {
+      if (clients?.has(socket.id)) {
+        console.log('🤡🤡 you are already in the room ', socket.id)
+        return;
+      }
 
-        //   return
-        // }
+      if (totalRoomClient<2) {
+        
         socket.join(roomID);
         socket.emit('room-joined', roomID)
         console.log(`${socket.id} joined in room ${roomID}`);

@@ -14,6 +14,7 @@ class SocketService extends ChangeNotifier {
   late IO.Socket _socket;
   final List<Message> _messages = [];
   String roomId = '';
+  String? mySocketID;
   //dynamic clients;
 
   List<Message> get messages => List.unmodifiable(_messages);
@@ -38,12 +39,12 @@ class SocketService extends ChangeNotifier {
     );
 
     _socket.connect();
-    dynamic socketID = _socket.id;
 
     _socket.onConnect((_) {
+      mySocketID = _socket.id;
       _isConnecting = false;
       _isConnected = true;
-      print('✅ Connected to server -  $socketID');
+      print('✅ Connected to server -  $mySocketID');
     });
 
     _socket.on('chat-message', (data) {
