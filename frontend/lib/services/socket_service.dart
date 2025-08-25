@@ -32,7 +32,7 @@ class SocketService extends ChangeNotifier {
     _isConnecting = true;
 
     _socket = IO.io(
-      'http://192.168.0.102:3500', // use 10.0.2.2 for Android emulator
+      'http://192.168.0.103:3500', // use 10.0.2.2 for Android emulator
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()

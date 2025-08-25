@@ -5,6 +5,8 @@ import { ONE_TO_ONE_CAPACITY } from '../config.js';
 import logger from '../utils/logger.js';
 
 export function handleRandomChat(socket, io) {
+
+
   socket.on('chat-random', () => {
 
     logger.info("chat-random called 11111");
@@ -13,8 +15,6 @@ export function handleRandomChat(socket, io) {
       socket.emit('random-status', { status: 'waiting' });
       return;
     }
-
-    logger.debug(QUEUE_SET);
 
     const partnerId = waitingQueue.find(id => id !== socket.id && socketMap.has(id));
     if (partnerId) {
@@ -27,7 +27,7 @@ export function handleRandomChat(socket, io) {
       logger.debug(`room id: ${roomID}`);
 
       ensureRoom(roomID, { capacity: ONE_TO_ONE_CAPACITY, isRandom: true });
-      //addSocketToRoom(socket, roomID);
+      addSocketToRoom(socket, roomID);
       addSocketToRoom(partner, roomID);
 
       socket.emit('random-paired', { roomID, peerId: partner.id });
@@ -45,8 +45,10 @@ export function handleRandomChat(socket, io) {
     }
   });
 
+
   socket.on('random-cancel', () => {
     QUEUE_SET.delete(socket.id);
     socket.emit('random-status', { status: 'canceled' });
   });
+
 }
