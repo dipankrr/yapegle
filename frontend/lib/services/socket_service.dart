@@ -15,6 +15,7 @@ class SocketService extends ChangeNotifier {
   final List<Message> _messages = [];
   String roomId = '';
   String? mySocketID;
+  String? randomStatus = '';
   //dynamic clients;
 
   List<Message> get messages => List.unmodifiable(_messages);
@@ -47,23 +48,49 @@ class SocketService extends ChangeNotifier {
       print('✅ Connected to server -  $mySocketID');
     });
 
-    _socket.on('chat-message', (data) {
+
+    // ==================== random chat ========================
+
+    _socket.on( 'random-paired', (data){
+      roomId = data['roomID'];
+      randomStatus = 'paired';
+      notifyListeners();
+
+      print('random-paired called' + roomId);
+      //joinRoom(roomId);
+
+    });
+
+    _socket.on( 'random-status', (data){
+      randomStatus = data['status'];
+      notifyListeners();
+    });
+
+    // ========================================================
+
+    _socket.on('chat-message', (fullData) {
+
+      //final msgg = data['msg'];
+
+      final data = fullData['data'];
 
       final msgData = Message.fromJson(data);
       _messages.add(msgData);
       notifyListeners(); // <-- notify listening widgets
     });
 
-    _socket.on('create-room', (roomID) {
-      roomId = roomID;
+    _socket.on('create-room', (data) {
+
+      roomId = data['roomID'];
+      //roomId = roomID;
       notifyListeners();
       print(roomId);
     });
 
-    _socket.on('room-joined', (roomID) {
-      roomId = roomID;
+    _socket.on('room-joined', (data) {
+      roomId = data['roomID'];
       sendMessage('joined room', true);
-      sendOwnMsg('you joined room $roomID', true);
+      sendOwnMsg('you joined room $roomId', true);
       notifyListeners();
       print(roomId);
     });
@@ -93,6 +120,10 @@ class SocketService extends ChangeNotifier {
 
   //
 
+  void chatRandom (){
+    connectToServer();
+    _socket.emit('chat-random', {});
+  }
 
   void createRoom(bool data) {
      connectToServer();
@@ -115,6 +146,7 @@ class SocketService extends ChangeNotifier {
     _socket.emit('leave-room', roomId);
     roomId = '';
     _messages.clear();
+    randomStatus = '';
     notifyListeners();
   }
 

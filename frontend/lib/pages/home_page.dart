@@ -17,6 +17,14 @@ class HomePage extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
 return Consumer<SocketService>(
 builder: (context, prov, child) {
+
+  if (prov.randomStatus == 'paired') {
+    Future.microtask(() {
+      context.go('/room/${prov.roomId}');
+      print('navigating to room');
+    });
+  }
+
 return
   Scaffold(
     body:
@@ -38,7 +46,13 @@ return
                   children: [
                     GestureDetector(
                       onTap: (){
-                        prov.connectToServer();
+
+                        prov.chatRandom();
+                        if (prov.randomStatus == 'paired' ) {
+                          context.go('/room/${prov.roomId}');
+                          print('waiting for others');
+                        }
+
                         // context.go('/room/:roomId');
                       },
                       child: Padding(

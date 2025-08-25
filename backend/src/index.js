@@ -67,16 +67,28 @@ io.on('connection', (socket) => {
 
   })
 
-  //
+  //helper funcs
+
+  function isValidRoom(roomID){
+    return rooms.includes(roomID)
+  }
+
+  function isClientAlreadyInRoom(socketID, roomID) {
+      const totalRoomClient = io.sockets.adapter.rooms.get(roomID)?.size ?? 0;
+      const clients = io.sockets.adapter.rooms.get(roomID);
+      clients?.has(socketID)
+  }
 
   socket.on('join-room', (roomID) => {
 
+    if (!isValidRoom(roomID)) { socket.emit('room-not-found', roomID) }
+    
 
     if (rooms.includes(roomID)) {
       const totalRoomClient = io.sockets.adapter.rooms.get(roomID)?.size ?? 0;
       const clients = io.sockets.adapter.rooms.get(roomID);
 
-      socket.emit('room-clients', totalRoomClient)
+      //socket.emit('room-clients', totalRoomClient)
 
       if (clients?.has(socket.id)) {
         console.log('🤡🤡 you are already in the room ', socket.id)
@@ -87,11 +99,11 @@ io.on('connection', (socket) => {
         
         socket.join(roomID);
         socket.emit('room-joined', roomID)
-        console.log(`${socket.id} joined in room ${roomID}`);
+        console.log(`➡️ ${socket.id} joined in room ${roomID}`);
 
       } else {
         socket.emit('room-full', socket.id )
-        console.log(socket.id , " 👈 this nigga tried to join room ", roomID);
+        console.log(socket.id , " 👈 this nigga tried to join full room ", roomID);
         
         console.log('room is full - ', totalRoomClient, clients);
         
@@ -141,6 +153,6 @@ app.get('/', (req, res) => {
 
 // server listen
 
-server.listen(3500, '192.168.0.102', () => {
+server.listen(3500, '192.168.0.103', () => {
   console.log('🚀 Server listening on http://localhost:3500');
 });
