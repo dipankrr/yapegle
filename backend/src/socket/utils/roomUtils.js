@@ -38,3 +38,21 @@ export function removeSocketFromRoom(socket, roomID) {
 
   if (!room.members.size) rooms.delete(roomID);
 }
+
+
+export function getRoomPeers (roomID) {
+
+  const roomInfo = rooms.get(roomID);
+  const peers = roomInfo.members
+
+  return peers
+}
+
+export function getPeerPartner(roomId, socketId) {
+  
+  const peers = getRoomPeers(roomId);
+  if (!peers || peers.size !== 2 || !peers.has(socketId)) return null;
+
+  for (const id of peers) if (id !== socketId) return id;
+  return null;
+}
